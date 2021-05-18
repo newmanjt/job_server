@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"path/filepath"
+	// "path/filepath"
 	"strings"
 	"time"
 )
@@ -345,7 +345,7 @@ func GetWebPage(url string, thumb_size string, x chan interface{}) {
 
 		u := uuid.New().String() + ".png"
 
-		chrome_server.Evaluate(url, u, User, GetPerfJSString(), y, thumb_size, exPath)
+		chrome_server.Evaluate(url, u, User, GetPerfJSString(), y, thumb_size, path)
 
 	}()
 	select {
