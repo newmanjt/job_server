@@ -90,9 +90,17 @@ func JobServer(user string, engines []string) {
 					go AsyncGetResults(x.ID, engine, url.QueryEscape(x.Topic), x.Num/len(engines), x.ThumbSize, JobChan)
 				}
 			case "update":
-
+				temp_job := jobs[x.ID]
+				for _, req := range x.List {
+					fmt.Println(fmt.Sprintf("loaded %s for %s", req.URL.x.ID))
+					temp_job.List = append(temp_job.List, req)
+				}
+				jobs[x.ID] = temp_job
+				if len(temp_job.List) == temp_job.Num {
+					SaveJob(CopyJob(temp_job))
+				}
 			case "request":
-
+				x.ReqChan <- jobs[x.ID].List
 			case "get":
 
 			}
@@ -195,6 +203,7 @@ func Setup(browser string, user string) {
 	chrome_server.NewTabChan = make(chan chrome_server.GlobalResponse)
 	chrome_server.EvaluateJSChan = make(chan chrome_server.GlobalResponse)
 	JobChan = make(chan JobRequest)
+	RespChan = make(chan Job)
 }
 
 //******************************
@@ -334,5 +343,25 @@ func GetWebPage(url string, thumb_size string, x chan interface{}) {
 		x <- z
 	case <-time.Tick(time.Second * 60):
 		x <- "timeout"
+	}
+}
+
+func CopyJob(job JobRequest) JobRequest {
+	return JobRequest{ID: job.ID, Topic: job.Topic, SearchEngine: job.SearchEngine, Num: job.Num, Type: job.Type, List: copyList(job.List), History: copyHistory(job.History), Active: job.Active, ThumbSize: job.ThumbSize}
+}
+
+func SaveJob(job JobRequest) {
+	fmt.Println(fmt.Sprintf("Saving: %+v", job))
+	f, err := os.OpenFile(fmt.Sprintf("./data/jobs/%s.json", job.ID), os.O_CREATE|os.O_WRONLY, 0644)
+	common.CheckError(err)
+	defer f.Close()
+	b, err := json.Marshal(job)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	if _, err = f.WriteString(string(b)); err != nil {
+		fmt.Println(err.Error())
+		return
 	}
 }
