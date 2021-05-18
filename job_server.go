@@ -193,10 +193,10 @@ func (j *Job) New(req JobRequest) {
 
 }
 
-func Setup(browser string, user string) {
+func Setup(browser string, user string, xvfb bool) {
 	KillBrowser(browser)
 	time.Sleep(2 * time.Second)
-	OpenBrowser(user, browser)
+	OpenBrowser(user, browser, xvfb)
 	time.Sleep(time.Second * 2)
 	chrome_server.RemoteChan = make(chan chrome_server.GlobalRequest)
 	chrome_server.NewTabChan = make(chan chrome_server.GlobalResponse)
