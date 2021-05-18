@@ -337,9 +337,15 @@ func GetWebPage(url string, thumb_size string, x chan interface{}) {
 			url = "https://" + url
 		}
 
+		ex, err := os.Executable()
+		if err != nil {
+			panic(err)
+		}
+		exPath := filepath.Dir(ex)
+
 		u := uuid.New().String() + ".png"
 
-		chrome_server.Evaluate(url, u, User, GetPerfJSString(), y, thumb_size)
+		chrome_server.Evaluate(url, u, User, GetPerfJSString(), y, thumb_size, exPath)
 
 	}()
 	select {
