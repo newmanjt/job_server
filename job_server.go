@@ -92,7 +92,6 @@ func JobServer(user string, engines []string) {
 			case "update":
 				temp_job := jobs[x.ID]
 				for _, req := range x.List {
-					fmt.Println(fmt.Sprintf("loaded %s for %s", req.URL.x.ID))
 					temp_job.List = append(temp_job.List, req)
 				}
 				jobs[x.ID] = temp_job
@@ -364,4 +363,21 @@ func SaveJob(job JobRequest) {
 		fmt.Println(err.Error())
 		return
 	}
+}
+func copyList(list []SearchResult) (x []SearchResult) {
+	for _, l := range list {
+		x = append(x, SearchResult{URL: l.URL, Location: l.Location, LoadTime: l.LoadTime, SpeedIndex: l.SpeedIndex, FirstPaint: l.FirstPaint, SearchEngine: l.SearchEngine, Images: l.Images, Words: l.Words, Scripts: l.Scripts})
+	}
+	return
+}
+
+func copyHistory(history [][]SearchResult) (x [][]SearchResult) {
+	x = make([][]SearchResult, len(history))
+	for i, list := range history {
+		x[i] = []SearchResult{}
+		for _, l := range list {
+			x[i] = append(x[i], SearchResult{URL: l.URL, Location: l.Location, LoadTime: l.LoadTime, SpeedIndex: l.SpeedIndex, FirstPaint: l.FirstPaint, SearchEngine: l.SearchEngine, Images: l.Images, Words: l.Words, Scripts: l.Scripts})
+		}
+	}
+	return
 }
