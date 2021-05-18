@@ -1,11 +1,11 @@
 package job_server
 
 import (
-	"../chrome_server"
-	"../common"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/newmanjt/chrome_server"
+	"github.com/newmanjt/common"
 	"os"
 	"os/exec"
 	"time"
@@ -135,13 +135,13 @@ func OpenBrowser(user string, browser string) {
 }
 
 func ProcessFlags() Config {
-	var configFlag = flag.String("c", "frameit.json", "Config File")
+	var configFlag = flag.String("c", "consolidated.json", "Config File")
 	var usageFlag = flag.Bool("h", false, "Show Usage")
 
 	flag.Parse()
 
 	if *usageFlag {
-		fmt.Println("FRAMEit")
+		fmt.Println("Job Server")
 		fmt.Println("\t'-h | display this text'")
 		fmt.Println("\t'-c | config file'")
 		os.Exit(1)
