@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+var ScholarURL = "scholar.google.com/scholar?q=%s&hl=en&as_sdt=0,14"
+
 type Config struct {
 	SupportedEngines []string `json:"supported_engines"`
 	ComboEngines     []string `json:"combo_engines"`
@@ -303,5 +305,26 @@ func AsyncGetResults(job_id string, engine string, topic string, num int, thumb_
 				return
 			}
 		}
+	}
+}
+
+//Get a webpage and return the path to screenshot
+func GetWebPage(url string, thumb_size string, x chan interface{}) {
+	y := make(chan interface{})
+	go func() {
+		if !strings.Contains(url, "http") {
+			url = "https://" + url
+		}
+
+		u := uuid.New().String() + ".png"
+
+		chrome_server.Evaluate(url, u, User, GetPerfJSString(), y, thumb_size)
+
+	}()
+	select {
+	case z := <-y:
+		x <- z
+	case <-time.Tick(time.Second * 60):
+		x <- "timeout"
 	}
 }
