@@ -225,12 +225,16 @@ func KillBrowser(browser string) {
 }
 
 //open an instance of |Browser| as |User|
-func OpenBrowser(user string, browser string) {
+func OpenBrowser(user string, browser string, xvfb bool) {
 	if browser == "brave" {
 		browser = "brave-browser"
 	}
-	cmd := exec.Command("sudo", "-u", user, browser, "--disk-cache-dir=/dev/null", "--disk-cache-size=1", "--media-cache-size=1", "--remote-debugging-port=9222")
-	// cmd := exec.Command("sudo", "-u", user, "xvfb-run", browser, "--window-size=1000,1000", "--disk-cache-dir=/dev/null", "--disk-cache-size=1", "--media-cache-size=1", "--remote-debugging-port=9222")
+	var cmd *exec.Cmd
+	if !xvfb {
+		cmd = exec.Command("sudo", "-u", user, browser, "--disk-cache-dir=/dev/null", "--disk-cache-size=1", "--media-cache-size=1", "--remote-debugging-port=9222")
+	} else {
+		cmd = exec.Command("sudo", "-u", user, "xvfb-run", browser, "--window-size=1000,1000", "--disk-cache-dir=/dev/null", "--disk-cache-size=1", "--media-cache-size=1", "--remote-debugging-port=9222")
+	}
 	go func() {
 		out, err := cmd.CombinedOutput()
 		common.CheckError(err)
