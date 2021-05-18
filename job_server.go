@@ -50,13 +50,16 @@ type SearchResult struct {
 }
 
 type JobRequest struct {
-	ID           string `json:"id"`
-	Topic        string `json:"topic"`
-	SearchEngine string `json:"search_engine"`
-	Num          int    `json:"num"`
-	Type         string `json:"type"`
-	Active       bool   `json:"active"`
-	ThumbSize    string `json:"thumb_size"`
+	ID           string              `json:"id"`
+	Topic        string              `json:"topic"`
+	SearchEngine string              `json:"search_engine"`
+	Num          int                 `json:"num"`
+	Type         string              `json:"type"`
+	Active       bool                `json:"active"`
+	ThumbSize    string              `json:"thumb_size"`
+	List         []SearchResult      `json:"list"`
+	History      [][]SearchResult    `json:"history"`
+	ReqChan      chan []SearchResult `json:"-"`
 }
 
 func JobServer(engines []string) {
