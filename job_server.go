@@ -55,13 +55,15 @@ type JobRequest struct {
 	ThumbSize    string `json:"thumb_size"`
 }
 
-func JobServer() {
+func JobServer(engines []string) {
 	common.LogMessage(JOBTAG, "Starting Job Server")
 
 	//start chrome_server
 	go chrome_server.RemoteServer()
 
 	//TODO: add cache functionality
+	jobs := make(map[string]JobRequest)
+
 	for {
 		select {
 		case x := <-JobChan:
@@ -69,8 +71,11 @@ func JobServer() {
 			case "new":
 				common.LogMessage(JOBTAG, fmt.Sprintf("Starting New Job: %s", x.ID))
 				//TODO: add cache filter on |x| if there are other topics like it
-				// jobs[x.ID] = x
+				jobs[x.ID] = x
 				//TODO: async results
+				for _, engine := range engines {
+					go AsyncGetResults(x.ID, engine, url.QueryEscape(x.Topic), x.Num(len(engines)), x.ThumbSize, JobChan)
+				}
 			case "update":
 
 			case "request":
