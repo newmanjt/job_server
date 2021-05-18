@@ -74,7 +74,7 @@ func JobServer(engines []string) {
 				jobs[x.ID] = x
 				//TODO: async results
 				for _, engine := range engines {
-					go AsyncGetResults(x.ID, engine, url.QueryEscape(x.Topic), x.Num(len(engines)), x.ThumbSize, JobChan)
+					go AsyncGetResults(x.ID, engine, url.QueryEscape(x.Topic), x.Num/len(engines), x.ThumbSize, JobChan)
 				}
 			case "update":
 
@@ -86,6 +86,87 @@ func JobServer(engines []string) {
 		}
 	}
 
+}
+
+func GetJSString(engine string) string {
+	switch engine {
+	case "bing":
+		return `
+			x = document.getElementsByClassName("b_algo");
+			y = [];
+			for ( i = 0; i < x.length; i++ ) {
+				y.push(x[i].childNodes[0].childNodes[0].href);
+			}
+			return y;
+		`
+	case "duckduckgo":
+		return `
+	x = document.getElementsByClassName("result__url");
+	y = [];
+	for (i = 0; i < x.length; i++){
+		y.push(x[i].href);
+	}
+	return y;
+`
+	case "scholar":
+		return `
+		x = document.getElementsByTagName("a");
+		y =[];
+		for (i = 0; i < x.length; i++){
+			if (x[i].href.includes(".pdf")){
+				y.push(x[i].href);
+			}
+		}
+		return y;
+		`
+	case "google":
+		return `
+			x = document.getElementsByClassName("yuRUbf");
+			y = [];
+			for (i = 0; i < x.length; i++) {
+				y.push(x[i].childNodes[0].href);
+			}
+			return y;
+		`
+	default:
+		return `
+	x = document.getElementsByClassName("result__url");
+	y = [];
+	for (i = 0; i < x.length; i++){
+		y.push(x[i].href);
+	}
+	return y;
+`
+	}
+}
+
+func GetSearchString(engine string, topic string) (url string) {
+	switch engine {
+	case "bing":
+		url = fmt.Sprintf("www.bing.com/search?q=%s&form=QBLH&sp=-1&pq=hell&sc=8-4&qs=n&sk=&cvid=36AD3D7D898541368A0028BEB68C081E", topic)
+	case "duckduckgo":
+		url = fmt.Sprintf("html.duckduckgo.com/html/?q=%s", topic)
+	case "scholar":
+		url = fmt.Sprintf(ScholarURL, topic)
+	case "google":
+		url = fmt.Sprintf("www.google.com/search?q=%s&source=hp&ei=exl3YLO5HIWitQWoxpzwBw&iflsig=AINFCbYAAAAAYHcniy21t5-rtec1vjQsQBTkBJ01qjHS&oq=hello&gs_lcp=Cgdnd3Mtd2l6EAMyBQgAELEDMgUILhCxAzIFCAAQsQMyBQgAELEDMggIABCxAxCDATICCAAyBQguELEDMggILhDHARCvATIFCAAQsQMyBQgAELEDOggIABDqAhCPAToOCC4QsQMQxwEQowIQkwI6CwguELEDEMcBEKMCOggILhDHARCjAjoRCC4QsQMQgwEQxwEQowIQkwI6AgguOggILhCxAxCDAVDJEFjJFGDpFWgBcAB4AIABfogBnAOSAQM0LjGYAQCgAQGqAQdnd3Mtd2l6sAEK&sclient=gws-wiz&ved=0ahUKEwjz4tCElf7vAhUFUa0KHSgjB34Q4dUDCAo&uact=5", topic)
+	}
+	return
+}
+
+func GetPerfJSString() string {
+	b, _ := common.LoadFile("./rum-speedindex.js")
+	return fmt.Sprintf(`
+	%s
+	let x = performance.timing.toJSON();
+	let perf_info = RUMSpeedIndex(); 
+	x["rum_si"] = perf_info["rum_si"];
+	x["rum_fp"] = perf_info["rum_fp"];
+	x["rects"] = perf_info["rects"];
+	x["words"] = perf_info["words"];
+	x["scripts"] = perf_info["scripts"];
+	return JSON.stringify(x);
+	`, string(b))
 }
 
 func (j *Job) New(req JobRequest) {
