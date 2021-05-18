@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/newmanjt/chrome_server"
 	"github.com/newmanjt/common"
 	"net/url"
@@ -14,6 +15,9 @@ import (
 )
 
 var ScholarURL = "scholar.google.com/scholar?q=%s&hl=en&as_sdt=0,14"
+var User string
+var SearchEngine string
+var Browser string
 
 type Config struct {
 	SupportedEngines []string `json:"supported_engines"`
@@ -62,11 +66,13 @@ type JobRequest struct {
 	ReqChan      chan []SearchResult `json:"-"`
 }
 
-func JobServer(engines []string) {
+func JobServer(user string, engines []string) {
 	common.LogMessage(JOBTAG, "Starting Job Server")
 
 	//start chrome_server
 	go chrome_server.RemoteServer()
+
+	User = user
 
 	//TODO: add cache functionality
 	jobs := make(map[string]JobRequest)
@@ -239,7 +245,6 @@ func ProcessFlags() Config {
 		fmt.Println("\t'-c | config file'")
 		os.Exit(1)
 	}
-
 	return LoadConfig(*configFlag)
 }
 
