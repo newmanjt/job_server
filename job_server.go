@@ -338,11 +338,10 @@ func GetWebPage(url string, thumb_size string, x chan interface{}) {
 			url = "https://" + url
 		}
 
-		ex, err := os.Executable()
+		path, err := os.Getwd()
 		if err != nil {
 			panic(err)
 		}
-		exPath := filepath.Dir(ex)
 
 		u := uuid.New().String() + ".png"
 
