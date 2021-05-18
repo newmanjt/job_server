@@ -229,8 +229,8 @@ func OpenBrowser(user string, browser string) {
 	if browser == "brave" {
 		browser = "brave-browser"
 	}
-	// cmd := exec.Command("sudo", "-u", user, browser, "--disk-cache-dir=/dev/null", "--disk-cache-size=1", "--media-cache-size=1", "--remote-debugging-port=9222")
-	cmd := exec.Command("sudo", "-u", user, "xvfb-run", browser, "--window-size=1000,1000", "--disk-cache-dir=/dev/null", "--disk-cache-size=1", "--media-cache-size=1", "--remote-debugging-port=9222")
+	cmd := exec.Command("sudo", "-u", user, browser, "--disk-cache-dir=/dev/null", "--disk-cache-size=1", "--media-cache-size=1", "--remote-debugging-port=9222")
+	// cmd := exec.Command("sudo", "-u", user, "xvfb-run", browser, "--window-size=1000,1000", "--disk-cache-dir=/dev/null", "--disk-cache-size=1", "--media-cache-size=1", "--remote-debugging-port=9222")
 	go func() {
 		out, err := cmd.CombinedOutput()
 		common.CheckError(err)
