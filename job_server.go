@@ -95,6 +95,7 @@ func JobServer(user string, engines []string) {
 					temp_job.List = append(temp_job.List, req)
 				}
 				jobs[x.ID] = temp_job
+				fmt.Println(len(temp_job.List), temp_job.Num)
 				if len(temp_job.List) == temp_job.Num {
 					SaveJob(CopyJob(temp_job))
 				}
